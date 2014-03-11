@@ -31,8 +31,10 @@ escape() {
   done;
 }
 
-active_session="$(loginctl show-seat ${seat}|grep ActiveSession|cut -d= -f2)"
-if [[ $? -ne 0 || -z $active_session ]]; then
+
+active_session="$(loginctl list-sessions | grep -n $seat | awk '{print $2}')"
+session_is_active="$(loginctl show-session $active_session | grep Active|cut -d= -f2)"
+if [[ $? -ne 0 || "$session_is_active" != "yes" ]]; then
   echo "Error: Unable to determine active session"
   exit 1
 fi
